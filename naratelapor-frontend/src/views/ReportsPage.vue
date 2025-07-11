@@ -1,0 +1,81 @@
+<template>
+  <div class="p-6 max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-4 text-gray-800">Daftar Laporan</h1>
+
+    <!-- Filter status -->
+    <div class="mb-6">
+      <label class="block mb-1 text-sm font-medium text-gray-600">Filter Status</label>
+      <select v-model="filterStatus" @change="fetchReports" class="border rounded px-3 py-2">
+        <option value="">Semua</option>
+        <option value="draft">Draft</option>
+        <option value="published">Published</option>
+      </select>
+    </div>
+
+    <div v-if="loading" class="text-gray-500">Mengambil data laporan...</div>
+    <div v-else-if="reports.length === 0" class="text-gray-500">Belum ada laporan.</div>
+
+    <ul v-else class="space-y-4">
+      <li v-for="report in reports" :key="report.id" class="p-4 bg-white rounded shadow">
+        <h2 class="text-lg font-semibold text-blue-600">{{ report.title }}</h2>
+        <p class="text-sm text-gray-600">Tanggal: {{ formatDate(report.date) }}</p>
+        <span
+          class="inline-block mt-2 px-2 py-1 rounded text-xs font-medium"
+          :class="report.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+        >
+          {{ report.status }}
+        </span>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue'
+
+const reports = ref([])
+const loading = ref(true)
+const filterStatus = ref('')
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr)
+  return d.toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+async function fetchReports() {
+  loading.value = true
+  const token = localStorage.getItem('token')
+  if (!token) return
+
+  let url = 'http://localhost:8002/reports'
+  if (filterStatus.value) {
+    url += `?status=${filterStatus.value}`
+  }
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    const data = await res.json()
+
+    if (res.ok) {
+      reports.value = data.data || []
+    } else {
+      console.error(data.message || 'Gagal mengambil laporan')
+    }
+  } catch (err) {
+    console.error('Gagal koneksi ke server:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchReports)
+</script>
