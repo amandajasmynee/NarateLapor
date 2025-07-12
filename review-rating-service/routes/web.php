@@ -13,3 +13,7 @@ $router->group(['middleware' => ['jwt.parse', 'role:supervisor']], function () u
     $router->put('/ratings/{report_id}', 'RatingController@update');
     $router->delete('/ratings/{report_id}', 'RatingController@destroy');
 });
+
+$router->options('/{any:.*}', function () {
+    return response('', 200);
+});

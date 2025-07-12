@@ -39,6 +39,6 @@ $router->group([], function () use ($router) {
     ]);
 });
 
-$router->options('{any:.*}', function () {
-    return response('OK', 200);
+$router->options('/{any:.*}', function () {
+    return response('', 200);
 });

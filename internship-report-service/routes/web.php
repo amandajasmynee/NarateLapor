@@ -22,11 +22,8 @@ $router->group(['middleware' => ['jwt.parse', 'role:intern']], function () use (
     $router->get('/reports/{id}', 'ReportController@show'); // lihat detail laporan sendiri
 });
 
-$router->options(
-    '{any:.*}',
-    ['middleware' => ['cors'], function () {
-        return response('', 200);
-    }]
-);
+$router->options('/{any:.*}', function () {
+    return response('', 200);
+});
 
 
