@@ -61,6 +61,13 @@
         >
           {{ report.status }}
         </span>
+        <button
+          v-if="report.status === 'draft'"
+          @click="submitReport(report.id)"
+          class="text-sm text-green-600 hover:underline ml-2"
+        >
+          Submit
+        </button>
       </li>
     </ul>
   </div>
@@ -140,6 +147,35 @@ async function deleteReport(id) {
     }
   } catch (err) {
     console.error('Gagal koneksi ke server:', err)
+  }
+}
+
+async function submitReport(id) {
+  const token = localStorage.getItem('token')
+  if (!token) return
+
+  const confirmed = confirm('Kirim laporan ini ke supervisor?')
+  if (!confirmed) return
+
+  try {
+    const res = await fetch(`http://localhost:8002/reports/${id}/publish`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    const data = await res.json()
+
+    if (res.ok) {
+      alert('Laporan berhasil dikirim!')
+      fetchReports() // refresh daftar
+    } else {
+      alert(data.message || 'Gagal submit laporan.')
+    }
+  } catch (err) {
+    console.error('Error submit laporan:', err)
+    alert('Terjadi kesalahan saat mengirim laporan.')
   }
 }
 
