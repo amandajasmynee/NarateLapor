@@ -9,6 +9,7 @@
         <option value="">Semua</option>
         <option value="draft">Draft</option>
         <option value="published">Published</option>
+        <option value="reviewed">Reviewed</option>
       </select>
     </div>
 
@@ -17,15 +18,20 @@
 
     <ul v-else class="space-y-4">
       <li v-for="report in reports" :key="report.id" class="p-4 bg-white rounded shadow">
-        <h2 class="text-lg font-semibold text-blue-600">{{ report.title }}</h2>
-        <p class="text-sm text-gray-600">Tanggal: {{ formatDate(report.date) }}</p>
-        <span
-          class="inline-block mt-2 px-2 py-1 rounded text-xs font-medium"
-          :class="report.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
-        >
-          {{ report.status }}
-        </span>
-      </li>
+      <router-link
+        :to="`/reports/${report.id}`"
+        class="text-lg font-semibold text-blue-600 hover:underline block"
+      >
+        {{ report.title || '(Tanpa Judul)' }}
+      </router-link>
+      <p class="text-sm text-gray-600">Tanggal: {{ formatDate(report.date) }}</p>
+      <span
+        class="inline-block mt-2 px-2 py-1 rounded text-xs font-medium"
+        :class="report.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+      >
+        {{ report.status }}
+      </span>
+    </li>
     </ul>
   </div>
 </template>
@@ -38,12 +44,15 @@ const loading = ref(true)
 const filterStatus = ref('')
 
 function formatDate(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return '-'
   const d = new Date(dateStr)
-  return d.toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
+  return isNaN(d.getTime())
+    ? '-'
+    : d.toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      })
 }
 
 async function fetchReports() {

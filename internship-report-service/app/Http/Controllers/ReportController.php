@@ -28,6 +28,7 @@ class ReportController extends Controller
                 'title'      => $report->title,
                 'content'    => $report->content,
                 'status'     => $report->status,
+                'date'       => $report->created_at->toDateString(),
                 'created_at' => $report->created_at,
                 'updated_at' => $report->updated_at,
             ]
@@ -70,6 +71,7 @@ class ReportController extends Controller
                     'title'      => $report->title,
                     'content'    => $report->content,
                     'status'     => $report->status,
+                    'date'       => $report->created_at->toDateString(),
                     'created_at' => $report->created_at,
                     'updated_at' => $report->updated_at,
                 ];
@@ -113,6 +115,7 @@ class ReportController extends Controller
                 'title'      => $report->title,
                 'content'    => $report->content,
                 'status'     => $report->status,
+                'date'       => $report->created_at->toDateString(),
                 'created_at' => $report->created_at,
                 'updated_at' => $report->updated_at,
             ]
@@ -159,6 +162,7 @@ class ReportController extends Controller
                 'title'      => $report->title,
                 'content'    => $report->content,
                 'status'     => $report->status,
+                'date'       => $report->created_at->toDateString(),
                 'created_at' => $report->created_at,
                 'updated_at' => $report->updated_at,
             ]
@@ -185,6 +189,7 @@ class ReportController extends Controller
                 'title'      => $report->title,
                 'content'    => $report->content,
                 'status'     => $report->status,
+                'date'       => $report->created_at->toDateString(),
                 'created_at' => $report->created_at,
                 'updated_at' => $report->updated_at,
             ];
@@ -210,6 +215,7 @@ class ReportController extends Controller
                 'title'      => $report->title,
                 'content'    => $report->content,
                 'status'     => $report->status,
+                'date'       => $report->created_at->toDateString(),
                 'created_at' => $report->created_at,
                 'updated_at' => $report->updated_at,
             ]
@@ -244,6 +250,7 @@ class ReportController extends Controller
                 'title'      => $report->title,
                 'content'    => $report->content,
                 'status'     => $report->status,
+                'date'       => $report->created_at->toDateString(),
                 'created_at' => $report->created_at,
                 'updated_at' => $report->updated_at,
             ]
