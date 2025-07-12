@@ -25,21 +25,39 @@
     <div v-else-if="reports.length === 0" class="text-gray-500">Belum ada laporan.</div>
 
     <ul v-else class="space-y-4">
-      <li
-        v-for="report in reports"
-        :key="report.id"
-        class="p-4 bg-white rounded shadow"
-      >
+      <li v-for="report in reports" :key="report.id" class="p-4 bg-white rounded shadow">
+        <!-- Judul -->
         <router-link
           :to="`/reports/${report.id}`"
           class="text-lg font-semibold text-blue-600 hover:underline block"
         >
           {{ report.title || '(Tanpa Judul)' }}
         </router-link>
+
+        <!-- Tombol edit (hanya jika draft) -->
+        <router-link
+          v-if="report.status === 'draft'"
+          :to="`/reports/${report.id}/edit`"
+          class="text-sm text-blue-500 hover:underline"
+        >
+          Edit
+        </router-link>
+
+        <button @click="deleteReport(report.id)" class="text-sm text-red-500 hover:underline">
+          Hapus
+        </button>
+
+        <!-- Tanggal & status -->
         <p class="text-sm text-gray-600">Tanggal: {{ formatDate(report.date) }}</p>
         <span
           class="inline-block mt-2 px-2 py-1 rounded text-xs font-medium"
-          :class="report.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+          :class="
+            report.status === 'published'
+              ? 'bg-green-100 text-green-800'
+              : report.status === 'reviewed'
+                ? 'bg-blue-100 text-blue-800'
+                : 'bg-yellow-100 text-yellow-800'
+          "
         >
           {{ report.status }}
         </span>
@@ -95,6 +113,33 @@ async function fetchReports() {
     console.error('Gagal koneksi ke server:', err)
   } finally {
     loading.value = false
+  }
+}
+
+async function deleteReport(id) {
+  const confirmDelete = confirm('Yakin ingin menghapus laporan ini?')
+  if (!confirmDelete) return
+
+  const token = localStorage.getItem('token')
+  if (!token) return
+
+  try {
+    const res = await fetch(`http://localhost:8002/reports/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    const data = await res.json()
+
+    if (res.ok) {
+      reports.value = reports.value.filter((r) => r.id !== id)
+    } else {
+      console.error(data.message || 'Gagal menghapus laporan')
+    }
+  } catch (err) {
+    console.error('Gagal koneksi ke server:', err)
   }
 }
 
