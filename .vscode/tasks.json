@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Auth Service",
+      "type": "shell",
+      "command": "php -S localhost:8001 -t public",
+      "options": {
+        "cwd": "${workspaceFolder}/auth-user-service"
+      },
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "Start Report Service",
+      "type": "shell",
+      "command": "php -S localhost:8002 -t public",
+      "options": {
+        "cwd": "${workspaceFolder}/internship-report-service"
+      },
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "Start Rating Service",
+      "type": "shell",
+      "command": "php -S localhost:8003 -t public",
+      "options": {
+        "cwd": "${workspaceFolder}/review-rating-service"
+      },
+      "problemMatcher": [],
+      "isBackground": true
+    },
+    {
+      "label": "Start All Services 🚀",
+      "dependsOn": [
+        "Start Auth Service",
+        "Start Report Service",
+        "Start Rating Service"
+      ],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    }
+  ]
+}
