@@ -13,25 +13,37 @@
       </select>
     </div>
 
+    <!-- Tombol buat laporan -->
+    <router-link
+      to="/reports/create"
+      class="inline-block mb-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+    >
+      + Buat Laporan
+    </router-link>
+
     <div v-if="loading" class="text-gray-500">Mengambil data laporan...</div>
     <div v-else-if="reports.length === 0" class="text-gray-500">Belum ada laporan.</div>
 
     <ul v-else class="space-y-4">
-      <li v-for="report in reports" :key="report.id" class="p-4 bg-white rounded shadow">
-      <router-link
-        :to="`/reports/${report.id}`"
-        class="text-lg font-semibold text-blue-600 hover:underline block"
+      <li
+        v-for="report in reports"
+        :key="report.id"
+        class="p-4 bg-white rounded shadow"
       >
-        {{ report.title || '(Tanpa Judul)' }}
-      </router-link>
-      <p class="text-sm text-gray-600">Tanggal: {{ formatDate(report.date) }}</p>
-      <span
-        class="inline-block mt-2 px-2 py-1 rounded text-xs font-medium"
-        :class="report.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
-      >
-        {{ report.status }}
-      </span>
-    </li>
+        <router-link
+          :to="`/reports/${report.id}`"
+          class="text-lg font-semibold text-blue-600 hover:underline block"
+        >
+          {{ report.title || '(Tanpa Judul)' }}
+        </router-link>
+        <p class="text-sm text-gray-600">Tanggal: {{ formatDate(report.date) }}</p>
+        <span
+          class="inline-block mt-2 px-2 py-1 rounded text-xs font-medium"
+          :class="report.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+        >
+          {{ report.status }}
+        </span>
+      </li>
     </ul>
   </div>
 </template>
