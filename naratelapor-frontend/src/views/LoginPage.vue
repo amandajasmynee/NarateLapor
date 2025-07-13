@@ -21,20 +21,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
 const error = ref('')
 const router = useRouter()
-
-onMounted(() => {
-  const token = localStorage.getItem('token')
-  if (token && token !== 'undefined') {
-    router.push('/dashboard')
-  }
-})
 
 const handleLogin = async () => {
   error.value = ''
@@ -44,13 +37,35 @@ const handleLogin = async () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email.value, password: password.value }),
     })
+
     const data = await res.json()
     if (!res.ok || !data.access_token) {
       error.value = data.message || 'Login gagal.'
       return
     }
-    localStorage.setItem('token', data.access_token)
-    router.push('/dashboard')
+
+    const token = data.access_token
+    localStorage.setItem('token', token)
+
+    const userRes = await fetch('http://localhost:8001/me', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    const userData = await userRes.json()
+    if (!userRes.ok) {
+      error.value = 'Gagal mengambil data user.'
+      return
+    }
+
+    // Simpan ke localStorage
+    localStorage.setItem('role', userData.role)
+    localStorage.setItem('user_id', userData.id)
+
+    // Arahkan ke dashboard sesuai role
+    router.push(`/dashboard/${userData.role}`)
   } catch (e) {
     error.value = 'Terjadi kesalahan koneksi.'
   }

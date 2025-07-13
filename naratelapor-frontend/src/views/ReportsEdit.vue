@@ -64,6 +64,7 @@ async function updateReport() {
     },
     body: JSON.stringify({
       title: title.value,
+      content: content.value,
       status: 'draft', // status tetap draft saat edit
     }),
   })

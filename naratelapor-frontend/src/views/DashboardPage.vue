@@ -1,8 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-green-100">
+  <div v-if="user" class="min-h-screen flex items-center justify-center bg-green-100">
     <div class="text-center">
       <h1 class="text-3xl font-bold text-green-700">
-        Halo, {{ user?.name || 'Pengguna' }} ({{ capitalizeRole(user?.role) }})! 👋
+        Halo, {{ user?.name || 'Pengguna' }} 
+        <span class="text-sm text-gray-600">({{ capitalizeRole(user?.role) }})</span> 👋
       </h1>
       <p class="text-gray-700 mt-2">
         Selamat datang di Dashboard NarateLapor 🎉
@@ -11,18 +12,29 @@
         Email: {{ user?.email || '-' }}
       </p>
 
-      <!-- Tombol ke laporan -->
-      <router-link
-        to="/reports"
-        class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
-        Lihat Laporan Saya
-      </router-link>
+      <!-- Tombol berdasarkan role -->
+      <div class="mt-6 space-y-3">
+        <router-link
+          v-if="user?.role === 'intern'"
+          to="/reports"
+          class="block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Lihat Laporan Saya 📝
+        </router-link>
+
+        <router-link
+          v-if="user?.role === 'supervisor' || user?.role === 'admin'"
+          to="/supervisor-reports"
+          class="block bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600"
+        >
+          Lihat Semua Laporan Intern 🔍
+        </router-link>
+      </div>
 
       <!-- Tombol Logout -->
       <button
         @click="logout"
-        class="mt-4 block mx-auto px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
+        class="mt-6 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
       >
         Logout
       </button>
@@ -32,10 +44,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
-const user = ref(null)
 const router = useRouter()
+const route = useRoute()
+const user = ref(null)
 
 function getUserFromToken() {
   const token = localStorage.getItem('token')
@@ -52,10 +65,16 @@ function getUserFromToken() {
 
 onMounted(() => {
   user.value = getUserFromToken()
+  const expectedRole = route.params.role
+
+  // ⛔ Kalau role di URL gak cocok sama token, redirect ke yang benar
+  if (user.value && user.value.role !== expectedRole) {
+    router.push(`/dashboard/${user.value.role}`)
+  }
 })
 
 function logout() {
-  localStorage.removeItem('token')
+  localStorage.clear()
   router.push('/')
 }
 

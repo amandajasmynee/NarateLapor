@@ -92,6 +92,7 @@ class ReportController extends Controller
     {
         $this->validate($request, [
             'title'  => 'required|string|max:255',
+            'content' => 'required|string',
             'status' => 'in:draft,submitted',
         ]);
 
@@ -104,6 +105,7 @@ class ReportController extends Controller
         }
 
         $report->title  = $request->title;
+        $report->content = $request->content ?? $report->content;
         $report->status = $request->status ?? $report->status;
         $report->save();
 
@@ -171,18 +173,19 @@ class ReportController extends Controller
 
     public function all(Request $request)
     {
-        $this->validate($request, [
-            'intern_id' => 'required|integer',
-            'status'    => 'nullable|in:draft,submitted,reviewed,revised',
-        ]);
+        $query = Report::query();
 
-        $query = Report::where('user_id', $request->query('intern_id'));
+        // Optional filter by intern_id (bisa untuk supervisor pilih intern tertentu)
+        if ($request->has('intern_id')) {
+            $query->where('user_id', $request->query('intern_id'));
+        }
 
+        // Optional filter by status
         if ($request->has('status')) {
             $query->where('status', $request->query('status'));
         }
 
-        $reports = $query->get()->map(function ($report) {
+        $reports = $query->orderBy('created_at', 'desc')->get()->map(function ($report) {
             return [
                 'id'         => $report->id,
                 'user_id'    => $report->user_id,
