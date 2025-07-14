@@ -1,11 +1,8 @@
 <template>
   <div class="p-6 max-w-4xl mx-auto">
-    <router-link
-      :to="dashboardRoute"
-      class="text-blue-600 hover:underline block mb-4"
-    >
+    <router-link :to="dashboardRoute" class="text-blue-600 hover:underline block mb-4">
       ← Kembali ke Dashboard
-  </router-link>
+    </router-link>
     <h1 class="text-2xl font-bold mb-4 text-gray-800">Daftar Laporan</h1>
 
     <!-- Filter status -->
@@ -39,7 +36,7 @@
           :to="`/reports/${report.id}`"
           class="text-lg font-semibold text-blue-600 hover:underline block"
         >
-          {{ report.title || '(Tanpa Judul)' }}
+          {{ report.title || 'Untitled' }}
         </router-link>
 
         <!-- Tanggal & status -->
@@ -64,16 +61,10 @@
           >
             Edit
           </router-link>
-          <button
-            @click="submitReport(report.id)"
-            class="text-sm text-green-600 hover:underline"
-          >
+          <button @click="submitReport(report.id)" class="text-sm text-green-600 hover:underline">
             Submit
           </button>
-          <button
-            @click="deleteReport(report.id)"
-            class="text-sm text-red-500 hover:underline"
-          >
+          <button @click="deleteReport(report.id)" class="text-sm text-red-500 hover:underline">
             Hapus
           </button>
         </div>
@@ -93,8 +84,8 @@ const dashboardRoute =
   role === 'admin'
     ? '/dashboard/admin'
     : role === 'supervisor'
-    ? '/dashboard/supervisor'
-    : '/dashboard'
+      ? '/dashboard/supervisor'
+      : '/dashboard'
 
 function formatDate(dateStr) {
   const d = new Date(dateStr)

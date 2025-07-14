@@ -5,7 +5,7 @@
     <div v-if="loading">Mengambil data laporan...</div>
     <div v-else-if="!report">Laporan tidak ditemukan.</div>
     <div v-else class="bg-white p-6 rounded shadow">
-      <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ report.title || '(Tanpa Judul)' }}</h1>
+      <h1 class="text-2xl font-bold text-gray-800 mb-2">{{ report.title || 'Untitled' }}</h1>
       <p class="text-sm text-gray-500 mb-1">Tanggal: {{ formatDate(report.date) }}</p>
       <span class="text-xs inline-block px-2 py-1 rounded font-semibold mb-4"
         :class="report.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">

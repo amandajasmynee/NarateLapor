@@ -37,6 +37,11 @@ $router->group([], function () use ($router) {
             return response()->json(['message' => 'Admin atau Supervisor boleh masuk']);
         }
     ]);
+
+    $router->get('/users/{id}', [
+        'middleware' => 'jwt.auth',
+        'uses' => 'AuthController@getUserById'
+    ]);
 });
 
 $router->options('/{any:.*}', function () {

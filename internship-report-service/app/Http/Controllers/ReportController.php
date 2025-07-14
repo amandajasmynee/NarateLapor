@@ -175,14 +175,24 @@ class ReportController extends Controller
     {
         $query = Report::query();
 
-        // Optional filter by intern_id (bisa untuk supervisor pilih intern tertentu)
-        if ($request->has('intern_id')) {
-            $query->where('user_id', $request->query('intern_id'));
+        // Jika user memilih status tertentu
+        if ($request->has('status')) {
+            $allowedStatus = ['submitted', 'reviewed', 'revised', 'done'];
+            $status = $request->query('status');
+
+            if (!in_array($status, $allowedStatus)) {
+                return response()->json(['message' => 'Status tidak valid'], 400);
+            }
+
+            $query->where('status', $status);
+        } else {
+            // Kalau tidak ada filter, ambil semua status yang valid (termasuk done!)
+            $query->whereIn('status', ['submitted', 'reviewed', 'revised', 'done']);
         }
 
-        // Optional filter by status
-        if ($request->has('status')) {
-            $query->where('status', $request->query('status'));
+        // Filter by intern_id jika dikirim
+        if ($request->has('intern_id')) {
+            $query->where('user_id', $request->query('intern_id'));
         }
 
         $reports = $query->orderBy('created_at', 'desc')->get()->map(function ($report) {
@@ -203,12 +213,15 @@ class ReportController extends Controller
 
     public function show(Request $request, $id)
     {
-        $userId = $request->get('user_id');
-
-        $report = Report::where('id', $id)->where('user_id', $userId)->first();
+        $report = \App\Models\Report::find($id); // langsung cari tanpa filter user_id
 
         if (! $report) {
             return response()->json(['message' => 'Report not found'], 404);
+        }
+
+        // Opsional: kalau kamu ingin batasi hanya yang statusnya bukan draft
+        if ($report->status === 'draft') {
+            return response()->json(['message' => 'Laporan masih draft'], 403);
         }
 
         return response()->json([
@@ -227,36 +240,47 @@ class ReportController extends Controller
 
     public function review(Request $request, $id)
     {
-        $this->validate($request, [
-            'status' => 'required|in:reviewed,revised',
-        ]);
+        try {
+            $this->validate($request, [
+                'status' => 'required|in:reviewed,revised,done',
+            ]);
 
-        $report = Report::find($id);
+            $report = Report::find($id);
 
-        if (! $report) {
-            return response()->json(['message' => 'Report not found'], 404);
+            if (! $report) {
+                return response()->json(['message' => 'Report not found'], 404);
+            }
+
+            // Validasi: status done hanya boleh jika sebelumnya reviewed
+            if ($request->status === 'done' && $report->status !== 'reviewed') {
+                return response()->json(['message' => 'Laporan hanya bisa ditandai selesai setelah direview'], 400);
+            }
+
+            if (!in_array($report->status, ['submitted', 'reviewed', 'revised'])) {
+                return response()->json(['message' => 'This report cannot be reviewed'], 400);
+            }
+
+            $report->status = $request->status;
+            $report->save();
+
+            return response()->json([
+                'message' => 'Report status updated',
+                'data' => [
+                    'id'         => $report->id,
+                    'user_id'    => $report->user_id,
+                    'title'      => $report->title,
+                    'content'    => $report->content,
+                    'status'     => $report->status,
+                    'date'       => $report->created_at->toDateString(),
+                    'created_at' => $report->created_at,
+                    'updated_at' => $report->updated_at,
+                ]
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan di server.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        // Optional: batasi hanya yang status saat ini masuk akal untuk direview ulang
-        if (!in_array($report->status, ['submitted', 'reviewed', 'revised'])) {
-            return response()->json(['message' => 'This report cannot be reviewed'], 400);
-        }
-
-        $report->status = $request->status;
-        $report->save();
-
-        return response()->json([
-            'message' => 'Report status updated',
-            'data' => [
-                'id'         => $report->id,
-                'user_id'    => $report->user_id,
-                'title'      => $report->title,
-                'content'    => $report->content,
-                'status'     => $report->status,
-                'date'       => $report->created_at->toDateString(),
-                'created_at' => $report->created_at,
-                'updated_at' => $report->updated_at,
-            ]
-        ]);
     }
 }

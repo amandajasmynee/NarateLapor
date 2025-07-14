@@ -57,4 +57,20 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
         ]);
     }
+
+    public function getUserById($id)
+    {
+        $user = \App\Models\User::find($id);
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ]);
+    }
 }
