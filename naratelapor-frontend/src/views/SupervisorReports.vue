@@ -14,7 +14,7 @@
         <option value="submitted">Submitted</option>
         <option value="reviewed">Reviewed</option>
         <option value="revised">Revised</option>
-        <option value="'done'">Done</option>
+        <option value="done">Done</option>
       </select>
     </div>
 
