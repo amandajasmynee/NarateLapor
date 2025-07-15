@@ -213,15 +213,23 @@ class ReportController extends Controller
 
     public function show(Request $request, $id)
     {
-        $report = \App\Models\Report::find($id); // langsung cari tanpa filter user_id
+        $userId = $request->get('user_id');
+        $role   = $request->get('user_role');
+        $report = \App\Models\Report::find($id);
 
         if (! $report) {
             return response()->json(['message' => 'Report not found'], 404);
         }
 
-        // Opsional: kalau kamu ingin batasi hanya yang statusnya bukan draft
         if ($report->status === 'draft') {
-            return response()->json(['message' => 'Laporan masih draft'], 403);
+            if ($role !== 'intern' || (int) $report->user_id !== (int) $userId) {
+                return response()->json([
+                    'message'           => 'Laporan masih draft',
+                    'report_user_id'    => $report->user_id,
+                    'logged_in_user_id' => $userId,
+                    'role'              => $role,
+                ], 403);
+            }
         }
 
         return response()->json([
