@@ -111,4 +111,24 @@ class RatingController extends Controller
 
         return response()->json(['message' => 'Rating deleted']);
     }
+
+    public function showByReport($report_id)
+    {
+        $rating = Rating::where('report_id', $report_id)->first();
+
+        if (! $rating) {
+            return response()->json(['message' => 'Rating belum tersedia'], 404);
+        }
+
+        return response()->json([
+            'data' => [
+                'report_id' => $rating->report_id,
+                'supervisor_id' => $rating->supervisor_id,
+                'rating' => $rating->rating,
+                'comment' => $rating->comment,
+                'created_at' => $rating->created_at,
+                'updated_at' => $rating->updated_at,
+            ]
+        ]);
+    }
 }

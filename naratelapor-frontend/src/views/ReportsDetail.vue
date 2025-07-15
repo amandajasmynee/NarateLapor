@@ -158,9 +158,14 @@ onMounted(async () => {
       report.value = data.data
     }
 
-    const ratingRes = await fetch(`http://localhost:8003/ratings/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    const ratingRes = await fetch(
+      role === 'intern'
+        ? `http://localhost:8003/ratings/report/${id}`
+        : `http://localhost:8003/ratings/${id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    )
     if (ratingRes.ok) {
       const ratingData = await ratingRes.json()
       rating.value = ratingData.data

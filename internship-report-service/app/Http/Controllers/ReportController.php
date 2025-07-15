@@ -104,6 +104,10 @@ class ReportController extends Controller
             return response()->json(['message' => 'Report not found'], 404);
         }
 
+        if (!in_array($report->status, ['draft', 'revised'])) {
+            return response()->json(['message' => 'Laporan tidak bisa diedit karena status-nya sudah final.'], 403);
+        }
+
         $report->title  = $request->title;
         $report->content = $request->content ?? $report->content;
         $report->status = $request->status ?? $report->status;

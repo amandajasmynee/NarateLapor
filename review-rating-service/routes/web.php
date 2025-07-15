@@ -14,6 +14,10 @@ $router->group(['middleware' => ['jwt.parse', 'role:supervisor']], function () u
     $router->delete('/ratings/{report_id}', 'RatingController@destroy');
 });
 
+$router->group(['middleware' => ['jwt.parse', 'role:intern']], function () use ($router) {
+    $router->get('/ratings/report/{report_id}', 'RatingController@showByReport');
+});
+
 $router->options('/{any:.*}', function () {
     return response('', 200);
 });

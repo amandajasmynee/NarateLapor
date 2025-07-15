@@ -54,7 +54,7 @@
         </span>
 
         <!-- Tombol untuk intern & status draft -->
-        <div class="mt-2 space-x-2" v-if="role === 'intern' && report.status === 'draft'">
+        <div class="mt-2 space-x-2" v-if="role === 'intern' && ['draft', 'revised'].includes(report.status)">
           <router-link
             :to="`/reports/${report.id}/edit`"
             class="text-sm text-blue-500 hover:underline"
