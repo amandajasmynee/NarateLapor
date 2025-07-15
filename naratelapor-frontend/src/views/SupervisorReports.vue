@@ -94,7 +94,21 @@ async function fetchReports() {
 
     const data = await res.json()
     if (res.ok) {
-      reports.value = data.data || []
+      const reportsWithUsername = await Promise.all(
+        (data.data || []).map(async (report) => {
+          try {
+            const userRes = await fetch(`http://localhost:8001/users/${report.user_id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+            const userData = await userRes.json()
+            report.username = userData?.name || 'Unknown'
+          } catch (e) {
+            report.username = 'Unknown'
+          }
+          return report
+        })
+      )
+      reports.value = reportsWithUsername
     } else {
       console.error(data.message)
       reports.value = []
